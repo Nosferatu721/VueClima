@@ -4,10 +4,12 @@ import { ref, computed } from 'vue'
 export default function useClima() {
   const clima = ref({})
   const buscandoClima = ref(false)
+  const error = ref('')
 
   const obtenerClima = async ({ ciudad, pais }) => {
     buscandoClima.value = true
     clima.value = {}
+    error.value = ''
     const apiKey = import.meta.env.VITE_API_KEY
     const url = `https://api.openweathermap.org/geo/1.0/direct?q=${ciudad},${pais}&limit=1&appid=${apiKey}`
 
@@ -22,10 +24,11 @@ export default function useClima() {
       await new Promise(resolve => setTimeout(resolve, 2000))
       clima.value = climaResponse.data
       // hacer que se demore un poco la respuesta para simular una carga
+    } catch (err) {
+      error.value = 'Ciudad No Encontrada'
+      // console.error('Error al obtener el clima:', err)
+    } finally {
       buscandoClima.value = false
-    } catch (error) {
-      console.error('Error al obtener el clima:', error)
-      throw error
     }
   }
 
@@ -50,5 +53,6 @@ export default function useClima() {
     mostrarClima,
     formatearTemperatura,
     buscandoClima,
+    error,
   }
 }
